@@ -487,6 +487,16 @@ bool SD3::GOQuestRewarded(Player* pPlayer, GameObject* pGo, Quest const* pQuest)
     return pTempScript->ToGameObjectScript()->OnQuestRewarded(pPlayer, pGo, pQuest);
 }
 
+void SD3::SetInitialWorldSettings() 
+{
+    Script* pWorldScript = m_scripts[SCRIPTED_WORLD];
+    if (!pWorldScript || !pWorldScript->ToWorldScript())
+    {
+        return;
+    }
+    return pWorldScript->ToWorldScript()->SetInitialWorldSettings();
+}
+
 bool SD3::AreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry)
 {
     Script* pTempScript = m_scripts[sScriptMgr.GetBoundScriptId(SCRIPTED_AREATRIGGER, atEntry->id)];
