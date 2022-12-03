@@ -78,7 +78,7 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget)
     if (iTextEntry >= 0)
     {
         script_error_log("DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process text entry %i, but text entry must be negative.",
-                            pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), iTextEntry);
+            pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), iTextEntry);
 
         return;
     }
@@ -125,7 +125,7 @@ void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map*
     }
 
     debug_log("[SD3]: DoOrSimulateScriptTextForMap: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u",
-                iTextEntry, pData->SoundId, pData->Type, pData->LanguageId, pData->Emote);
+        iTextEntry, pData->SoundId, pData->Type, pData->LanguageId, pData->Emote);
 
     if (pData->Type != CHAT_TYPE_ZONE_YELL)
     {
@@ -175,12 +175,12 @@ void Script::RegisterSelf(bool bReportError)
 void SD3::FreeScriptLibrary()
 {
     // Free Spell Summary
-    delete []SpellSummary;
+    delete[]SpellSummary;
 
     // Free resources before library unload
     for (SDScriptVec::const_iterator itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
     {
-        delete *itr;
+        delete* itr;
     }
 
     m_scripts.clear();
@@ -487,13 +487,15 @@ bool SD3::GOQuestRewarded(Player* pPlayer, GameObject* pGo, Quest const* pQuest)
     return pTempScript->ToGameObjectScript()->OnQuestRewarded(pPlayer, pGo, pQuest);
 }
 
-void SD3::SetInitialWorldSettings() 
+void SD3::SetInitialWorldSettings()
 {
-    Script* pWorldScript = m_scripts[SCRIPTED_WORLD];
+    Script* pWorldScript = m_scripts[sScriptMgr.SetInitialWorldSettings()];
+
     if (!pWorldScript || !pWorldScript->ToWorldScript())
     {
         return;
     }
+
     return pWorldScript->ToWorldScript()->SetInitialWorldSettings();
 }
 
@@ -563,7 +565,7 @@ GameObjectAI* SD3::GetGameObjectAI(GameObject* pGo)
         return nullptr;
     }
 
-    GameObjectAI * goAI = pTempScript->ToGameObjectScript()->GetAI(pGo);
+    GameObjectAI* goAI = pTempScript->ToGameObjectScript()->GetAI(pGo);
 
     return goAI;
 }

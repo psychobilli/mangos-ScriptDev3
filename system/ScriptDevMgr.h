@@ -93,7 +93,7 @@ public:
     static bool EffectDummyGameObject(Unit*, uint32, SpellEffectIndex, GameObject*, ObjectGuid);
     static bool EffectDummyItem(Unit*, uint32, SpellEffectIndex, Item*, ObjectGuid);
     static bool EffectScriptEffectUnit(Unit*, uint32, SpellEffectIndex, Unit*, ObjectGuid);
-    static bool AuraDummy(Aura const *, bool);
+    static bool AuraDummy(Aura const*, bool);
     //static bool AuraDummyTick(Aura const*);         [-ZERO:] no dummy ticks. TODO
 };
 
@@ -112,22 +112,22 @@ public:
  */
 enum EscortFaction
 {
-    FACTION_ESCORT_A_NEUTRAL_PASSIVE    = 10,
-    FACTION_ESCORT_H_NEUTRAL_PASSIVE    = 33,
-    FACTION_ESCORT_N_NEUTRAL_PASSIVE    = 113,
+    FACTION_ESCORT_A_NEUTRAL_PASSIVE = 10,
+    FACTION_ESCORT_H_NEUTRAL_PASSIVE = 33,
+    FACTION_ESCORT_N_NEUTRAL_PASSIVE = 113,
 
-    FACTION_ESCORT_A_NEUTRAL_ACTIVE     = 231,
-    FACTION_ESCORT_H_NEUTRAL_ACTIVE     = 232,
-    FACTION_ESCORT_N_NEUTRAL_ACTIVE     = 250,
+    FACTION_ESCORT_A_NEUTRAL_ACTIVE = 231,
+    FACTION_ESCORT_H_NEUTRAL_ACTIVE = 232,
+    FACTION_ESCORT_N_NEUTRAL_ACTIVE = 250,
 
-    FACTION_ESCORT_N_FRIEND_PASSIVE     = 290,
-    FACTION_ESCORT_N_FRIEND_ACTIVE      = 495,
+    FACTION_ESCORT_N_FRIEND_PASSIVE = 290,
+    FACTION_ESCORT_N_FRIEND_ACTIVE = 495,
 
-    FACTION_ESCORT_A_PASSIVE            = 774,
-    FACTION_ESCORT_H_PASSIVE            = 775,
+    FACTION_ESCORT_A_PASSIVE = 774,
+    FACTION_ESCORT_H_PASSIVE = 775,
 
-    FACTION_ESCORT_N_ACTIVE             = 1986,
-    FACTION_ESCORT_H_ACTIVE             = 2046
+    FACTION_ESCORT_N_ACTIVE = 1986,
+    FACTION_ESCORT_H_ACTIVE = 2046
 };
 
 // *********************************************************
@@ -135,6 +135,7 @@ enum EscortFaction
 struct CreatureScript;
 struct GameObjectScript;
 struct ItemScript;
+struct WorldScript;
 struct AreaTriggerScript;
 struct MapEventScript;
 struct ZoneScript;
@@ -225,7 +226,7 @@ struct WorldScript : public Script
 {
     WorldScript(const char* name) : Script(SCRIPTED_WORLD, name) {}
 
-    virtual void SetInitialWorldSettings() { return; };
+    virtual void SetInitialWorldSettings();
 };
 
 struct AreaTriggerScript : public Script
@@ -237,7 +238,7 @@ struct AreaTriggerScript : public Script
 
 struct MapEventScript : public Script
 {
-    MapEventScript(const char *name) : Script(SCRIPTED_MAPEVENT, name) {}
+    MapEventScript(const char* name) : Script(SCRIPTED_MAPEVENT, name) {}
 
     virtual bool OnReceived(uint32, Object*, Object*, bool) { return false; }
 };
