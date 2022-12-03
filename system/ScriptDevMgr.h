@@ -84,6 +84,7 @@ public:
     static bool ItemEquip(Player*, Item*, bool);    //new TODO
     static bool ItemDelete(Player*, Item*);         //new TODO
     static void SetInitialWorldSettings();
+    static void OnPlayerLogin(Player*, bool);
     static bool AreaTrigger(Player*, AreaTriggerEntry const*);
 #if defined (WOTLK) || defined (CATA) || defined(MISTS)
     static bool NpcSpellClick(Player* pPlayer, Creature* pClickedCreature, uint32 uiSpellId);
@@ -136,6 +137,7 @@ struct CreatureScript;
 struct GameObjectScript;
 struct ItemScript;
 struct WorldScript;
+struct PlayerScript;
 struct AreaTriggerScript;
 struct MapEventScript;
 struct ZoneScript;
@@ -162,6 +164,7 @@ struct Script
     GameObjectScript* ToGameObjectScript() { return Type == SCRIPTED_GAMEOBJECT && IsValid() ? (GameObjectScript*)this : nullptr; }
     ItemScript* ToItemScript() { return Type == SCRIPTED_ITEM && IsValid() ? (ItemScript*)this : nullptr; }
     WorldScript* ToWorldScript() { return Type == SCRIPTED_WORLD && IsValid() ? (WorldScript*)this : nullptr; }
+    PlayerScript* ToPlayerScript() { return Type == SCRIPTED_PLAYER && IsValid() ? (PlayerScript*)this : nullptr; }
     AreaTriggerScript* ToAreaTriggerScript() { return Type == SCRIPTED_AREATRIGGER && IsValid() ? (AreaTriggerScript*)this : nullptr; }
     MapEventScript* ToMapEventScript() { return Type == SCRIPTED_MAPEVENT && IsValid() ? (MapEventScript*)this : nullptr; }
     ZoneScript* ToZoneScript() { return Type == SCRIPTED_MAP && IsValid() ? (ZoneScript*)this : nullptr; }
@@ -227,6 +230,13 @@ struct WorldScript : public Script
     WorldScript(const char* name) : Script(SCRIPTED_WORLD, name) {}
 
     virtual void SetInitialWorldSettings();
+};
+
+struct PlayerScript : public Script
+{
+    PlayerScript(const char* name) : Script(SCRIPTED_PLAYER, name) {}
+
+    virtual void OnLogin(Player* pPlayer, bool firstLogin);
 };
 
 struct AreaTriggerScript : public Script

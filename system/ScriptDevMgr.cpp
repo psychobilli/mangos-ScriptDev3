@@ -489,7 +489,7 @@ bool SD3::GOQuestRewarded(Player* pPlayer, GameObject* pGo, Quest const* pQuest)
 
 void SD3::SetInitialWorldSettings()
 {
-    Script* pWorldScript = m_scripts[sScriptMgr.SetInitialWorldSettings()];
+    Script* pWorldScript = m_scripts[SCRIPTED_WORLD];
 
     if (!pWorldScript || !pWorldScript->ToWorldScript())
     {
@@ -497,6 +497,18 @@ void SD3::SetInitialWorldSettings()
     }
 
     return pWorldScript->ToWorldScript()->SetInitialWorldSettings();
+}
+
+void SD3::OnPlayerLogin(Player* pPlayer, bool firstLogin)
+{
+    Script* pPlayerScript = m_scripts[SCRIPTED_PLAYER];
+
+    if (!pPlayerScript || !pPlayerScript->ToPlayerScript())
+    {
+        return;
+    }
+
+    return pPlayerScript->ToPlayerScript()->OnLogin(pPlayer, firstLogin);
 }
 
 bool SD3::AreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry)
