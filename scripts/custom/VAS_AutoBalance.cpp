@@ -256,10 +256,10 @@ public:
     }
 };
 
-class VAS_AutoBalance_UnitScript : public CreatureScript
+class VAS_AutoBalance_CreatureScript : public CreatureScript
 {
 public:
-    VAS_AutoBalance_UnitScript()
+    VAS_AutoBalance_CreatureScript()
         : CreatureScript("VAS_AutoBalance_UnitScript")
     {
     }
@@ -305,7 +305,7 @@ public:
         return damage;
     }
 
-    void CalculateSpellDamageTaken(SpellNonMeleeDamage *damageInfo, int32 /*damage*/, SpellEntry* const /*spellInfo*/, WeaponAttackType/* attackType*/, bool /*crit*/)
+    void CalculateSpellDamageTaken(SpellNonMeleeDamage *damageInfo, int32 /*damage*/, SpellEntry const* /*spellInfo*/, WeaponAttackType/* attackType*/, bool /*crit*/)
     {
         if (sConfig.GetIntDefault("VASAutoBalance.DungeonsOnly", 1) < 1 || (damageInfo->attacker->GetMap()->IsDungeon() && damageInfo->target->GetMap()->IsDungeon()) || (damageInfo->attacker->GetMap()->IsBattleGround() && damageInfo->target->GetMap()->IsBattleGround()))
         {
@@ -517,7 +517,7 @@ public:
         }
 
         CreatureInfo const *creatureTemplate = creature->GetCreatureInfo();
-        CreatureClassLvlStats const* creatureStats = sObjectMgr->GetCreatureClassLvlStats(creature->getLevel(), creatureTemplate->UnitClass);
+        CreatureClassLvlStats const* creatureStats = sObjectMgr.GetCreatureClassLvlStats(creature->getLevel(), creatureTemplate->UnitClass);
 
         float damageMultiplier = 1.0f;
         float healthMultiplier = 1.0f;
@@ -528,7 +528,7 @@ public:
         if (lockPlayerCount > 0 && lockPlayerCount < instancePlayerCount) {
             instancePlayerCount = lockPlayerCount;
         }
-        uint32 maxNumberOfPlayers = (sMapMgr->FindMap(creature->GetMapId(), creature->GetInstanceId()))->GetMaxPlayers();
+        uint32 maxNumberOfPlayers = (sMapMgr.FindMap(creature->GetMapId(), creature->GetInstanceId()))->GetPlayers().getSize();
         uint32 scaledHealth = 0;
         uint32 scaledMana = 0;
 
@@ -690,7 +690,7 @@ void AddSC_VAS_AutoBalance()
 {
     new VAS_AutoBalance_WorldScript;
     new VAS_AutoBalance_PlayerScript;
-    new VAS_AutoBalance_UnitScript;
+    new VAS_AutoBalance_CreatureScript;
     new VAS_AutoBalance_AllCreatureScript;
     new VAS_AutoBalance_AllMapScript;
     //new VAS_AutoBalance_CommandScript;

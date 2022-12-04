@@ -83,8 +83,17 @@ public:
     static bool ItemUse(Player*, Item*, SpellCastTargets const&);
     static bool ItemEquip(Player*, Item*, bool);    //new TODO
     static bool ItemDelete(Player*, Item*);         //new TODO
+    static void OnDamage(Creature*, Unit*, uint32&);
+    static void ModHeal(Unit*, Creature*, uint32&);
+    static uint32 HandlePeriodicDamageAurasTick(Unit*, Creature*, int32);
+    static void CalculateSpellDamageTaken(SpellNonMeleeDamage*, int32, SpellEntry const*, WeaponAttackType, bool);
+    static void CalculateMeleeDamage(Unit*, uint32, CalcDamageInfo*, WeaponAttackType);
     static void SetInitialWorldSettings();
     static void OnPlayerLogin(Player*, bool);
+    static void OnPlayerEnterAll(Map* map, Player* player);
+    static void OnPlayerLeaveAll(Map* map, Player* player);
+    static void Creature_SelectLevel(CreatureInfo* const, Creature*);
+    static void OnAllCreatureUpdate(Creature*, uint32);
     static bool AreaTrigger(Player*, AreaTriggerEntry const*);
 #if defined (WOTLK) || defined (CATA) || defined(MISTS)
     static bool NpcSpellClick(Player* pPlayer, Creature* pClickedCreature, uint32 uiSpellId);
@@ -138,6 +147,8 @@ struct GameObjectScript;
 struct ItemScript;
 struct WorldScript;
 struct PlayerScript;
+struct AllMapScript;
+struct AllCreatureScript;
 struct AreaTriggerScript;
 struct MapEventScript;
 struct ZoneScript;
@@ -165,6 +176,8 @@ struct Script
     ItemScript* ToItemScript() { return Type == SCRIPTED_ITEM && IsValid() ? (ItemScript*)this : nullptr; }
     WorldScript* ToWorldScript() { return Type == SCRIPTED_WORLD && IsValid() ? (WorldScript*)this : nullptr; }
     PlayerScript* ToPlayerScript() { return Type == SCRIPTED_PLAYER && IsValid() ? (PlayerScript*)this : nullptr; }
+    AllMapScript* ToAllMapScript() { return Type == SCRIPTED_MAP_ALL && IsValid() ? (AllMapScript*)this : nullptr; }
+    AllCreatureScript* ToAllCreatureScript() { return Type == SCRIPTED_CREATURE_ALL && IsValid() ? (AllCreatureScript*)this : nullptr; }
     AreaTriggerScript* ToAreaTriggerScript() { return Type == SCRIPTED_AREATRIGGER && IsValid() ? (AreaTriggerScript*)this : nullptr; }
     MapEventScript* ToMapEventScript() { return Type == SCRIPTED_MAPEVENT && IsValid() ? (MapEventScript*)this : nullptr; }
     ZoneScript* ToZoneScript() { return Type == SCRIPTED_MAP && IsValid() ? (ZoneScript*)this : nullptr; }
@@ -189,6 +202,11 @@ struct CreatureScript : public Script
     virtual uint32 OnDialogEnd(Player*, Creature*) { return DIALOG_STATUS_UNDEFINED; }
     virtual bool OnQuestAccept(Player*, Creature*, Quest const*) { return false; }
     virtual bool OnQuestRewarded(Player*, Creature*, Quest const*) { return false; }
+    virtual void OnDamage(Creature*, Unit*, uint32&) { return; }
+    virtual void ModHeal(Unit*, Creature*, uint32&) { return; }
+    virtual uint32 HandlePeriodicDamageAurasTick(Unit*, Creature*, int32 damage) { return damage; }
+    virtual void CalculateSpellDamageTaken(SpellNonMeleeDamage*, int32, SpellEntry const*, WeaponAttackType, bool) { return; }
+    virtual void CalculateMeleeDamage(Unit*, uint32, CalcDamageInfo*, WeaponAttackType) { return; }
 #if defined (WOTLK) || defined (CATA) || defined(MISTS)
     virtual bool OnSpellClick(Player*, Creature*, uint32) { return false; }
 #endif
@@ -229,14 +247,30 @@ struct WorldScript : public Script
 {
     WorldScript(const char* name) : Script(SCRIPTED_WORLD, name) {}
 
-    virtual void SetInitialWorldSettings();
+    virtual void SetInitialWorldSettings() { return; };
 };
 
 struct PlayerScript : public Script
 {
     PlayerScript(const char* name) : Script(SCRIPTED_PLAYER, name) {}
 
-    virtual void OnLogin(Player* pPlayer, bool firstLogin);
+    virtual void OnLogin(Player* pPlayer, bool firstLogin) { return; };
+};
+
+struct AllMapScript : public Script
+{
+    AllMapScript(const char* name) : Script(SCRIPTED_MAP_ALL, name) {}
+
+    virtual void OnPlayerEnterAll(Map* map, Player* player) { return; };
+    virtual void OnPlayerLeaveAll(Map* map, Player* player) { return; };
+};
+
+struct AllCreatureScript : public Script
+{
+    AllCreatureScript(const char* name) : Script(SCRIPTED_CREATURE_ALL, name) {}
+
+    virtual void Creature_SelectLevel(CreatureInfo* const creatureTemplate, Creature* creature) { return; }
+    virtual void OnAllCreatureUpdate(Creature* pCreature, uint32 diff) { return; }
 };
 
 struct AreaTriggerScript : public Script

@@ -487,6 +487,62 @@ bool SD3::GOQuestRewarded(Player* pPlayer, GameObject* pGo, Quest const* pQuest)
     return pTempScript->ToGameObjectScript()->OnQuestRewarded(pPlayer, pGo, pQuest);
 }
 
+void SD3::OnDamage(Creature* attacker, Unit* victim, uint32& damage)
+{
+    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+
+    if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
+    {
+        return;
+    }
+
+    return pCreatureScript->ToCreatureScript()->OnDamage(attacker, victim, damage);
+}
+void SD3::ModHeal(Unit* healer, Creature* receiver, uint32& gain)
+{
+    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+
+    if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
+    {
+        return;
+    }
+
+    return pCreatureScript->ToCreatureScript()->ModHeal(healer, receiver, gain);
+}
+uint32 SD3::HandlePeriodicDamageAurasTick(Unit* target, Creature* caster, int32 damage)
+{
+    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+
+    if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
+    {
+        return damage;
+    }
+
+    return pCreatureScript->ToCreatureScript()->HandlePeriodicDamageAurasTick(target, caster, damage);
+}
+void SD3::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellEntry const* spellInfo, WeaponAttackType attackType, bool crit)
+{
+    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+
+    if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
+    {
+        return;
+    }
+
+    return pCreatureScript->ToCreatureScript()->CalculateSpellDamageTaken(damageInfo, damage, spellInfo, attackType, crit);
+}
+void SD3::CalculateMeleeDamage(Unit* playerVictim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType)
+{
+    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+
+    if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
+    {
+        return;
+    }
+
+    return pCreatureScript->ToCreatureScript()->CalculateMeleeDamage(playerVictim, damage, damageInfo, attackType);
+}
+
 void SD3::SetInitialWorldSettings()
 {
     Script* pWorldScript = m_scripts[SCRIPTED_WORLD];
@@ -509,6 +565,54 @@ void SD3::OnPlayerLogin(Player* pPlayer, bool firstLogin)
     }
 
     return pPlayerScript->ToPlayerScript()->OnLogin(pPlayer, firstLogin);
+}
+
+void SD3::OnPlayerEnterAll(Map* map, Player* player)
+{
+    Script* pMapScript = m_scripts[SCRIPTED_MAP_ALL];
+
+    if (!pMapScript || !pMapScript->ToAllMapScript())
+    {
+        return;
+    }
+
+    return pMapScript->ToAllMapScript()->OnPlayerEnterAll(map, player);
+}
+
+void SD3::OnPlayerLeaveAll(Map* map, Player* player)
+{
+    Script* pMapScript = m_scripts[SCRIPTED_MAP_ALL];
+
+    if (!pMapScript || !pMapScript->ToAllMapScript())
+    {
+        return;
+    }
+
+    return pMapScript->ToAllMapScript()->OnPlayerLeaveAll(map, player);
+}
+
+void SD3::Creature_SelectLevel(CreatureInfo* const creatureTemplate, Creature* creature)
+{
+    Script* pCreatureScript = m_scripts[SCRIPTED_CREATURE_ALL];
+
+    if (!pCreatureScript || !pCreatureScript->ToAllCreatureScript())
+    {
+        return;
+    }
+
+    return pCreatureScript->ToAllCreatureScript()->Creature_SelectLevel(creatureTemplate, creature);
+}
+
+void SD3::OnAllCreatureUpdate(Creature* pCreature, uint32 diff)
+{
+    Script* pCreatureScript = m_scripts[SCRIPTED_CREATURE_ALL];
+
+    if (!pCreatureScript || !pCreatureScript->ToAllCreatureScript())
+    {
+        return;
+    }
+
+    return pCreatureScript->ToAllCreatureScript()->OnAllCreatureUpdate(pCreature, diff);
 }
 
 bool SD3::AreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry)
