@@ -688,10 +688,16 @@ public:
 //};
 void AddSC_VAS_AutoBalance()
 {
-    new VAS_AutoBalance_WorldScript;
-    new VAS_AutoBalance_PlayerScript;
-    new VAS_AutoBalance_CreatureScript;
-    new VAS_AutoBalance_AllCreatureScript;
-    new VAS_AutoBalance_AllMapScript;
+    Script* s;
+    s = new VAS_AutoBalance_WorldScript;
+    s->RegisterSelf();
+    s = new VAS_AutoBalance_PlayerScript;
+    s->RegisterSelf();
+    s = new VAS_AutoBalance_CreatureScript;
+    s->RegisterSelf();
+    s = new VAS_AutoBalance_AllCreatureScript;
+    s->RegisterSelf();
+    s = new VAS_AutoBalance_AllMapScript;
+    s->RegisterSelf();
     //new VAS_AutoBalance_CommandScript;
 }

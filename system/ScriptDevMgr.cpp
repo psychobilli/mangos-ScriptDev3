@@ -489,7 +489,8 @@ bool SD3::GOQuestRewarded(Player* pPlayer, GameObject* pGo, Quest const* pQuest)
 
 void SD3::OnDamage(Creature* attacker, Unit* victim, uint32& damage)
 {
-    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+    uint32 index = GetScriptId(UNIT_SCRIPT);
+    Script* pCreatureScript = m_scripts[index];
 
     if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
     {
@@ -500,7 +501,8 @@ void SD3::OnDamage(Creature* attacker, Unit* victim, uint32& damage)
 }
 void SD3::ModHeal(Unit* healer, Creature* receiver, uint32& gain)
 {
-    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+    uint32 index = GetScriptId(UNIT_SCRIPT);
+    Script* pCreatureScript = m_scripts[index];
 
     if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
     {
@@ -511,7 +513,8 @@ void SD3::ModHeal(Unit* healer, Creature* receiver, uint32& gain)
 }
 uint32 SD3::HandlePeriodicDamageAurasTick(Unit* target, Creature* caster, int32 damage)
 {
-    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+    uint32 index = GetScriptId(UNIT_SCRIPT);
+    Script* pCreatureScript = m_scripts[index];
 
     if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
     {
@@ -522,7 +525,8 @@ uint32 SD3::HandlePeriodicDamageAurasTick(Unit* target, Creature* caster, int32 
 }
 void SD3::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellEntry const* spellInfo, WeaponAttackType attackType, bool crit)
 {
-    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+    uint32 index = GetScriptId(UNIT_SCRIPT);
+    Script* pCreatureScript = m_scripts[index];
 
     if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
     {
@@ -533,7 +537,8 @@ void SD3::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damag
 }
 void SD3::CalculateMeleeDamage(Unit* playerVictim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType)
 {
-    Script* pCreatureScript = m_scripts[SCRIPTED_UNIT];
+    uint32 index = GetScriptId(UNIT_SCRIPT);
+    Script* pCreatureScript = m_scripts[index];
 
     if (!pCreatureScript || !pCreatureScript->ToCreatureScript())
     {
@@ -545,7 +550,8 @@ void SD3::CalculateMeleeDamage(Unit* playerVictim, uint32 damage, CalcDamageInfo
 
 void SD3::SetInitialWorldSettings()
 {
-    Script* pWorldScript = m_scripts[SCRIPTED_WORLD];
+    uint32 index = GetScriptId(WORLD_SCRIPT);
+    Script* pWorldScript = m_scripts[index];
 
     if (!pWorldScript || !pWorldScript->ToWorldScript())
     {
@@ -557,7 +563,8 @@ void SD3::SetInitialWorldSettings()
 
 void SD3::OnPlayerLogin(Player* pPlayer, bool firstLogin)
 {
-    Script* pPlayerScript = m_scripts[SCRIPTED_PLAYER];
+    uint32 index = GetScriptId(PLAYER_SCRIPT);
+    Script* pPlayerScript = m_scripts[index];
 
     if (!pPlayerScript || !pPlayerScript->ToPlayerScript())
     {
@@ -569,7 +576,8 @@ void SD3::OnPlayerLogin(Player* pPlayer, bool firstLogin)
 
 void SD3::OnPlayerEnterAll(Map* map, Player* player)
 {
-    Script* pMapScript = m_scripts[SCRIPTED_MAP_ALL];
+    uint32 index = GetScriptId(ALLMAP_SCRIPT);
+    Script* pMapScript = m_scripts[index];
 
     if (!pMapScript || !pMapScript->ToAllMapScript())
     {
@@ -581,7 +589,8 @@ void SD3::OnPlayerEnterAll(Map* map, Player* player)
 
 void SD3::OnPlayerLeaveAll(Map* map, Player* player)
 {
-    Script* pMapScript = m_scripts[SCRIPTED_MAP_ALL];
+    uint32 index = GetScriptId(ALLMAP_SCRIPT);
+    Script* pMapScript = m_scripts[index];
 
     if (!pMapScript || !pMapScript->ToAllMapScript())
     {
@@ -593,7 +602,8 @@ void SD3::OnPlayerLeaveAll(Map* map, Player* player)
 
 void SD3::Creature_SelectLevel(CreatureInfo* const creatureTemplate, Creature* creature)
 {
-    Script* pCreatureScript = m_scripts[SCRIPTED_CREATURE_ALL];
+    uint32 index = GetScriptId(ALLCREATURE_SCRIPT);
+    Script* pCreatureScript = m_scripts[index];
 
     if (!pCreatureScript || !pCreatureScript->ToAllCreatureScript())
     {
@@ -605,7 +615,8 @@ void SD3::Creature_SelectLevel(CreatureInfo* const creatureTemplate, Creature* c
 
 void SD3::OnAllCreatureUpdate(Creature* pCreature, uint32 diff)
 {
-    Script* pCreatureScript = m_scripts[SCRIPTED_CREATURE_ALL];
+    uint32 index = GetScriptId(ALLCREATURE_SCRIPT);
+    Script* pCreatureScript = m_scripts[index];
 
     if (!pCreatureScript || !pCreatureScript->ToAllCreatureScript())
     {

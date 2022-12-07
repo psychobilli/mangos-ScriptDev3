@@ -1138,6 +1138,14 @@ void AddBattlegroundScripts()
     AddSC_battleground();
 }
 
+// custom
+void AddSC_VAS_AutoBalance();
+
+void AddCustomScripts()
+{
+    AddSC_VAS_AutoBalance();
+}
+
 // initialize scripts
 void AddScripts()
 {
@@ -1153,4 +1161,5 @@ void AddScripts()
 #endif
 
     AddBattlegroundScripts();
+    AddCustomScripts();
 }

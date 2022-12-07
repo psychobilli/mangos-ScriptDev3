@@ -160,6 +160,12 @@ struct AuraScript;
 struct ConditionScript;
 struct AchievementScript;
 
+static const char* WORLD_SCRIPT = "VAS_AutoBalance_WorldScript";
+static const char* PLAYER_SCRIPT = "VAS_AutoBalance_PlayerScript";
+static const char* UNIT_SCRIPT = "VAS_AutoBalance_UnitScript";
+static const char* ALLCREATURE_SCRIPT = "VAS_AutoBalance_AllCreatureScript";
+static const char* ALLMAP_SCRIPT = "VAS_AutoBalance_AllMapScript";
+
 struct Script
 {
     std::string Name;
