@@ -360,7 +360,7 @@ public:
 
     void OnPlayerEnterAll(Map* map, Player* player)
     {
-        int instancePlayerCount = map->GetPlayersCountExceptGMs() - 1;
+        int instancePlayerCount = map->GetPlayersCountExceptGMs();
         if (lockPlayerCount > 0 && lockPlayerCount < instancePlayerCount) {
             instancePlayerCount = lockPlayerCount;
         }
@@ -387,7 +387,7 @@ public:
 
     void OnPlayerLeaveAll(Map* map, Player* player)
     {
-        int instancePlayerCount = map->GetPlayersCountExceptGMs() - 1;
+        int instancePlayerCount = map->GetPlayersCountExceptGMs();
         if (lockPlayerCount > 0 && lockPlayerCount < instancePlayerCount) {
             instancePlayerCount = lockPlayerCount;
         }
@@ -522,13 +522,13 @@ public:
         float damageMultiplier = 1.0f;
         float healthMultiplier = 1.0f;
 
-        uint32 baseHealth = creatureStats->BaseHealth;
+        uint32 baseHealth = creatureStats->BaseHealth * creatureTemplate->HealthMultiplier;
         uint32 baseMana = creatureStats->BaseMana;
         int instancePlayerCount = creature->GetMap()->GetPlayersCountExceptGMs();
         if (lockPlayerCount > 0 && lockPlayerCount < instancePlayerCount) {
             instancePlayerCount = lockPlayerCount;
         }
-        uint32 maxNumberOfPlayers = (sMapMgr.FindMap(creature->GetMapId(), creature->GetInstanceId()))->GetPlayers().getSize();
+        uint32 maxNumberOfPlayers = GetInstanceCount(creature->GetMapId(), creature->GetEntry());
         uint32 scaledHealth = 0;
         uint32 scaledMana = 0;
 
@@ -564,8 +564,8 @@ public:
         case 40:
             healthMultiplier = (float)instancePlayerCount / (float)maxNumberOfPlayers; // 40 Man Instances oddly enough scale better with the old formula
             break;
-        case 25:
-            healthMultiplier = (tanh((instancePlayerCount - 16.5f) / 1.5f) + 1.0f) / 2.0f;
+        case 20:
+            healthMultiplier = (tanh((instancePlayerCount - 5.9f) / 1.5f) + 1.0f) / 2.0f;
             break;
         case 10:
             healthMultiplier = (tanh((instancePlayerCount - 4.5f) / 1.5f) + 1.0f) / 2.0f;
@@ -629,6 +629,68 @@ public:
         creature->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)scaledHealth);
         creature->SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, (float)scaledMana);
         CreatureDetails[creature->GetObjectGuid()].DamageMultiplier = damageMultiplier;
+    }
+
+    uint32 GetInstanceCount(uint32 mapId, uint32 creatureGuid) {
+        switch (mapId) {
+        case 33://Shadowfang Keep
+        case 34://Stormwind Stockade
+        case 36://Deadmines
+        case 43://Wailing Caverns
+        case 47://Razorfen Kraul
+        case 48://Blackfathom Deeps
+        case 70://Uldaman
+        case 90://Gnomeregan
+        case 109://Sunken Temple
+        case 129://Razorfen Downs
+        case 189://Scarlet Monastery
+        case 209://Zul'Farrak
+        case 230://Blackrock Depths
+        case 289://Scholomance
+        case 329://Stratholme
+        case 349://Maraudon
+        case 389://Ragefire Chasm
+        case 429://Dire Maul
+            return 5;
+        case 229://Blackrock Spire
+            switch (creatureGuid) {
+            case 10318:
+            case 9817:
+            case 10317:
+            case 10316:
+            case 10319:
+            case 9818:
+            case 10762:
+            case 9819:
+            case 10814:
+            case 10899:
+            case 10339:
+            case 10509:
+            case 16042:
+            case 10162:
+            case 9816:
+            case 10371:
+            case 10366:
+            case 9096:
+            case 10372:
+            case 10083:
+            case 10430:
+                return 10;// Upper Blackrock Spire
+            default:
+                return 5;// Lower Blackrock Spire
+            }
+        case 309://Zul'Gurub
+        case 531://Ahn'Qiraj Temple
+            return 20;
+        case 249://Onyxia's Lair
+        case 409://Molten Core
+        case 469://Blackwing Lair
+        case 509://Ruins of Ahn'Qiraj
+        case 533://Naxxramas
+            return 40;
+        default:
+            1;
+        }
     }
 };
 //class VAS_AutoBalance_CommandScript : public CommandScript
