@@ -574,6 +574,32 @@ void SD3::OnPlayerLogin(Player* pPlayer, bool firstLogin)
     return pPlayerScript->ToPlayerScript()->OnLogin(pPlayer, firstLogin);
 }
 
+uint8 SD3::ModQuestLoot(Player* pPlayer, LootItem item)
+{
+    uint32 index = GetScriptId(LOOT_SCRIPT);
+    Script* pLootScript = m_scripts[index];
+
+    if (!pLootScript || !pLootScript->ToLootScript())
+    {
+        return 0;
+    }
+
+    return pLootScript->ToLootScript()->ModQuestLoot(pPlayer, item);
+}
+
+bool SD3::ClearModQuestLoot(Player* pPlayer)
+{
+    uint32 index = GetScriptId(LOOT_SCRIPT);
+    Script* pLootScript = m_scripts[index];
+
+    if (!pLootScript || !pLootScript->ToLootScript())
+    {
+        return 0;
+    }
+
+    return pLootScript->ToLootScript()->ClearModQuestLoot(pPlayer);
+}
+
 void SD3::OnPlayerEnterAll(Map* map, Player* player)
 {
     uint32 index = GetScriptId(ALLMAP_SCRIPT);

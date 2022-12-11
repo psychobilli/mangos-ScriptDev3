@@ -90,6 +90,8 @@ public:
     static void CalculateMeleeDamage(Unit*, uint32, CalcDamageInfo*, WeaponAttackType);
     static void SetInitialWorldSettings();
     static void OnPlayerLogin(Player*, bool);
+    static uint8 ModQuestLoot(Player*, LootItem);
+    static bool ClearModQuestLoot(Player*);
     static void OnPlayerEnterAll(Map* map, Player* player);
     static void OnPlayerLeaveAll(Map* map, Player* player);
     static void Creature_SelectLevel(CreatureInfo* const, Creature*);
@@ -147,6 +149,7 @@ struct GameObjectScript;
 struct ItemScript;
 struct WorldScript;
 struct PlayerScript;
+struct LootScript;
 struct AllMapScript;
 struct AllCreatureScript;
 struct AreaTriggerScript;
@@ -163,6 +166,7 @@ struct AchievementScript;
 static const char* WORLD_SCRIPT = "VAS_AutoBalance_WorldScript";
 static const char* PLAYER_SCRIPT = "VAS_AutoBalance_PlayerScript";
 static const char* UNIT_SCRIPT = "VAS_AutoBalance_UnitScript";
+static const char* LOOT_SCRIPT = "MultiBoxerQuestHelper_LootScript";
 static const char* ALLCREATURE_SCRIPT = "VAS_AutoBalance_AllCreatureScript";
 static const char* ALLMAP_SCRIPT = "VAS_AutoBalance_AllMapScript";
 
@@ -182,6 +186,7 @@ struct Script
     ItemScript* ToItemScript() { return Type == SCRIPTED_ITEM && IsValid() ? (ItemScript*)this : nullptr; }
     WorldScript* ToWorldScript() { return Type == SCRIPTED_WORLD && IsValid() ? (WorldScript*)this : nullptr; }
     PlayerScript* ToPlayerScript() { return Type == SCRIPTED_PLAYER && IsValid() ? (PlayerScript*)this : nullptr; }
+    LootScript* ToLootScript() { return Type == SCRIPTED_LOOT && IsValid() ? (LootScript*)this : nullptr; }
     AllMapScript* ToAllMapScript() { return Type == SCRIPTED_MAP_ALL && IsValid() ? (AllMapScript*)this : nullptr; }
     AllCreatureScript* ToAllCreatureScript() { return Type == SCRIPTED_CREATURE_ALL && IsValid() ? (AllCreatureScript*)this : nullptr; }
     AreaTriggerScript* ToAreaTriggerScript() { return Type == SCRIPTED_AREATRIGGER && IsValid() ? (AreaTriggerScript*)this : nullptr; }
@@ -261,6 +266,14 @@ struct PlayerScript : public Script
     PlayerScript(const char* name) : Script(SCRIPTED_PLAYER, name) {}
 
     virtual void OnLogin(Player* pPlayer, bool firstLogin) { return; };
+};
+
+struct LootScript : public Script
+{
+    LootScript(const char* name) : Script(SCRIPTED_LOOT, name) {}
+
+    virtual uint8 ModQuestLoot(Player* player, LootItem item) { return 0; };
+    virtual bool ClearModQuestLoot(Player* player) { return true; };
 };
 
 struct AllMapScript : public Script
