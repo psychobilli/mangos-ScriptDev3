@@ -53,7 +53,7 @@ void SystemMgr::LoadScriptTextsCustom()
 void SystemMgr::LoadScriptGossipTexts()
 {
     outstring_log("[SD3]: Loading Gossip Texts...");
-    LoadMangosStringsOneWordId(WorldDatabase, "gossip_texts", TEXT_SOURCE_GOSSIP_START, TEXT_SOURCE_GOSSIP_END);
+    LoadMangosStrings(WorldDatabase, "gossip_texts", TEXT_SOURCE_GOSSIP_START, TEXT_SOURCE_GOSSIP_END);
 }
 
 void SystemMgr::LoadScriptWaypoints()
