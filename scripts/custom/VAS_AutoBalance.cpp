@@ -632,27 +632,7 @@ public:
     }
 
     uint32 GetInstanceCount(uint32 mapId, uint32 creatureGuid) {
-        switch (mapId) {
-        case 33://Shadowfang Keep
-        case 34://Stormwind Stockade
-        case 36://Deadmines
-        case 43://Wailing Caverns
-        case 47://Razorfen Kraul
-        case 48://Blackfathom Deeps
-        case 70://Uldaman
-        case 90://Gnomeregan
-        case 109://Sunken Temple
-        case 129://Razorfen Downs
-        case 189://Scarlet Monastery
-        case 209://Zul'Farrak
-        case 230://Blackrock Depths
-        case 289://Scholomance
-        case 329://Stratholme
-        case 349://Maraudon
-        case 389://Ragefire Chasm
-        case 429://Dire Maul
-            return 5;
-        case 229://Blackrock Spire
+        if (mapId == 229) { //Blackrock Spire
             switch (creatureGuid) {
             case 10318:
             case 9817:
@@ -679,6 +659,27 @@ public:
             default:
                 return 5;// Lower Blackrock Spire
             }
+        }
+        switch (mapId) {
+        case 33://Shadowfang Keep
+        case 34://Stormwind Stockade
+        case 36://Deadmines
+        case 43://Wailing Caverns
+        case 47://Razorfen Kraul
+        case 48://Blackfathom Deeps
+        case 70://Uldaman
+        case 90://Gnomeregan
+        case 109://Sunken Temple
+        case 129://Razorfen Downs
+        case 189://Scarlet Monastery
+        case 209://Zul'Farrak
+        case 230://Blackrock Depths
+        case 289://Scholomance
+        case 329://Stratholme
+        case 349://Maraudon
+        case 389://Ragefire Chasm
+        case 429://Dire Maul
+            return 5;
         case 309://Zul'Gurub
         case 531://Ahn'Qiraj Temple
             return 20;
