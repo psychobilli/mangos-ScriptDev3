@@ -42,6 +42,11 @@ file(GLOB sources_base base/*.cpp base/*.h)
     LIST(APPEND mangosscript_LIB_SRCS ${sources_base})
     source_group("Base Files" FILES ${sources_base})
 
+#Custom Scripts
+file(GLOB sources_custom scripts/custom/*.cpp scripts/custom/*.h)
+    LIST(APPEND mangosscript_LIB_SRCS ${sources_custom})
+    source_group("Custom Scripts" FILES ${sources_custom})
+
 #Battleground Scripts
 file(GLOB sources_battlegrounds scripts/battlegrounds/*.cpp scripts/battlegrounds/*.h)
     LIST(APPEND mangosscript_LIB_SRCS ${sources_battlegrounds})

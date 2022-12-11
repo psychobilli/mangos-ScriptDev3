@@ -1142,6 +1142,16 @@ void AddBattlegroundScripts()
     AddSC_battleground();
 }
 
+// custom
+void AddSC_VAS_AutoBalance();
+void AddSC_MultiBoxerQuestHelper();
+
+void AddCustomScripts()
+{
+    AddSC_VAS_AutoBalance();
+    AddSC_MultiBoxerQuestHelper();
+}
+
 // initialize scripts
 void AddScripts()
 {
@@ -1157,4 +1167,5 @@ void AddScripts()
 #endif
 
     AddBattlegroundScripts();
+    AddCustomScripts();
 }

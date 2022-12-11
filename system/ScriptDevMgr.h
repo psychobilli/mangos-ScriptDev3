@@ -83,6 +83,19 @@ public:
     static bool ItemUse(Player*, Item*, SpellCastTargets const&);
     static bool ItemEquip(Player*, Item*, bool);    //new TODO
     static bool ItemDelete(Player*, Item*);         //new TODO
+    static void OnDamage(Creature*, Unit*, uint32&);
+    static void ModHeal(Unit*, Creature*, uint32&);
+    static uint32 HandlePeriodicDamageAurasTick(Unit*, Creature*, int32);
+    static void CalculateSpellDamageTaken(SpellNonMeleeDamage*, int32, SpellEntry const*, WeaponAttackType, bool);
+    static void CalculateMeleeDamage(Unit*, uint32, CalcDamageInfo*, WeaponAttackType);
+    static void SetInitialWorldSettings();
+    static void OnPlayerLogin(Player*, bool);
+    static uint8 ModQuestLoot(Player*, LootItem);
+    static bool ClearModQuestLoot(Player*);
+    static void OnPlayerEnterAll(Map* map, Player* player);
+    static void OnPlayerLeaveAll(Map* map, Player* player);
+    static void Creature_SelectLevel(CreatureInfo* const, Creature*);
+    static void OnAllCreatureUpdate(Creature*, uint32);
     static bool AreaTrigger(Player*, AreaTriggerEntry const*);
 #if defined (WOTLK) || defined (CATA) || defined(MISTS)
     static bool NpcSpellClick(Player* pPlayer, Creature* pClickedCreature, uint32 uiSpellId);
@@ -92,7 +105,7 @@ public:
     static bool EffectDummyGameObject(Unit*, uint32, SpellEffectIndex, GameObject*, ObjectGuid);
     static bool EffectDummyItem(Unit*, uint32, SpellEffectIndex, Item*, ObjectGuid);
     static bool EffectScriptEffectUnit(Unit*, uint32, SpellEffectIndex, Unit*, ObjectGuid);
-    static bool AuraDummy(Aura const *, bool);
+    static bool AuraDummy(Aura const*, bool);
     //static bool AuraDummyTick(Aura const*);         [-ZERO:] no dummy ticks. TODO
 };
 
@@ -111,22 +124,22 @@ public:
  */
 enum EscortFaction
 {
-    FACTION_ESCORT_A_NEUTRAL_PASSIVE    = 10,
-    FACTION_ESCORT_H_NEUTRAL_PASSIVE    = 33,
-    FACTION_ESCORT_N_NEUTRAL_PASSIVE    = 113,
+    FACTION_ESCORT_A_NEUTRAL_PASSIVE = 10,
+    FACTION_ESCORT_H_NEUTRAL_PASSIVE = 33,
+    FACTION_ESCORT_N_NEUTRAL_PASSIVE = 113,
 
-    FACTION_ESCORT_A_NEUTRAL_ACTIVE     = 231,
-    FACTION_ESCORT_H_NEUTRAL_ACTIVE     = 232,
-    FACTION_ESCORT_N_NEUTRAL_ACTIVE     = 250,
+    FACTION_ESCORT_A_NEUTRAL_ACTIVE = 231,
+    FACTION_ESCORT_H_NEUTRAL_ACTIVE = 232,
+    FACTION_ESCORT_N_NEUTRAL_ACTIVE = 250,
 
-    FACTION_ESCORT_N_FRIEND_PASSIVE     = 290,
-    FACTION_ESCORT_N_FRIEND_ACTIVE      = 495,
+    FACTION_ESCORT_N_FRIEND_PASSIVE = 290,
+    FACTION_ESCORT_N_FRIEND_ACTIVE = 495,
 
-    FACTION_ESCORT_A_PASSIVE            = 774,
-    FACTION_ESCORT_H_PASSIVE            = 775,
+    FACTION_ESCORT_A_PASSIVE = 774,
+    FACTION_ESCORT_H_PASSIVE = 775,
 
-    FACTION_ESCORT_N_ACTIVE             = 1986,
-    FACTION_ESCORT_H_ACTIVE             = 2046
+    FACTION_ESCORT_N_ACTIVE = 1986,
+    FACTION_ESCORT_H_ACTIVE = 2046
 };
 
 // *********************************************************
@@ -134,6 +147,11 @@ enum EscortFaction
 struct CreatureScript;
 struct GameObjectScript;
 struct ItemScript;
+struct WorldScript;
+struct PlayerScript;
+struct LootScript;
+struct AllMapScript;
+struct AllCreatureScript;
 struct AreaTriggerScript;
 struct MapEventScript;
 struct ZoneScript;
@@ -144,6 +162,13 @@ struct SpellScript;
 struct AuraScript;
 struct ConditionScript;
 struct AchievementScript;
+
+static const char* WORLD_SCRIPT = "VAS_AutoBalance_WorldScript";
+static const char* PLAYER_SCRIPT = "VAS_AutoBalance_PlayerScript";
+static const char* UNIT_SCRIPT = "VAS_AutoBalance_UnitScript";
+static const char* LOOT_SCRIPT = "MultiBoxerQuestHelper_LootScript";
+static const char* ALLCREATURE_SCRIPT = "VAS_AutoBalance_AllCreatureScript";
+static const char* ALLMAP_SCRIPT = "VAS_AutoBalance_AllMapScript";
 
 struct Script
 {
@@ -159,6 +184,11 @@ struct Script
     CreatureScript* ToCreatureScript() { return Type == SCRIPTED_UNIT && IsValid() ? (CreatureScript*)this : nullptr; }
     GameObjectScript* ToGameObjectScript() { return Type == SCRIPTED_GAMEOBJECT && IsValid() ? (GameObjectScript*)this : nullptr; }
     ItemScript* ToItemScript() { return Type == SCRIPTED_ITEM && IsValid() ? (ItemScript*)this : nullptr; }
+    WorldScript* ToWorldScript() { return Type == SCRIPTED_WORLD && IsValid() ? (WorldScript*)this : nullptr; }
+    PlayerScript* ToPlayerScript() { return Type == SCRIPTED_PLAYER && IsValid() ? (PlayerScript*)this : nullptr; }
+    LootScript* ToLootScript() { return Type == SCRIPTED_LOOT && IsValid() ? (LootScript*)this : nullptr; }
+    AllMapScript* ToAllMapScript() { return Type == SCRIPTED_MAP_ALL && IsValid() ? (AllMapScript*)this : nullptr; }
+    AllCreatureScript* ToAllCreatureScript() { return Type == SCRIPTED_CREATURE_ALL && IsValid() ? (AllCreatureScript*)this : nullptr; }
     AreaTriggerScript* ToAreaTriggerScript() { return Type == SCRIPTED_AREATRIGGER && IsValid() ? (AreaTriggerScript*)this : nullptr; }
     MapEventScript* ToMapEventScript() { return Type == SCRIPTED_MAPEVENT && IsValid() ? (MapEventScript*)this : nullptr; }
     ZoneScript* ToZoneScript() { return Type == SCRIPTED_MAP && IsValid() ? (ZoneScript*)this : nullptr; }
@@ -181,6 +211,11 @@ struct CreatureScript : public Script
     virtual uint32 OnDialogEnd(Player*, Creature*) { return DIALOG_STATUS_UNDEFINED; }
     virtual bool OnQuestAccept(Player*, Creature*, Quest const*) { return false; }
     virtual bool OnQuestRewarded(Player*, Creature*, Quest const*) { return false; }
+    virtual void OnDamage(Creature*, Unit*, uint32&) { return; }
+    virtual void ModHeal(Unit*, Creature*, uint32&) { return; }
+    virtual uint32 HandlePeriodicDamageAurasTick(Unit*, Creature*, int32 damage) { return damage; }
+    virtual void CalculateSpellDamageTaken(SpellNonMeleeDamage*, int32, SpellEntry const*, WeaponAttackType, bool) { return; }
+    virtual void CalculateMeleeDamage(Unit*, uint32, CalcDamageInfo*, WeaponAttackType) { return; }
 #if defined (WOTLK) || defined (CATA) || defined(MISTS)
     virtual bool OnSpellClick(Player*, Creature*, uint32) { return false; }
 #endif
@@ -217,6 +252,44 @@ struct ItemScript : public Script
     virtual bool OnGossipSelectWithCode(Player*, Item*, uint32, uint32, const char*) { return false; }
 };
 
+struct WorldScript : public Script
+{
+    WorldScript(const char* name) : Script(SCRIPTED_WORLD, name) {}
+
+    virtual void SetInitialWorldSettings() { return; };
+};
+
+struct PlayerScript : public Script
+{
+    PlayerScript(const char* name) : Script(SCRIPTED_PLAYER, name) {}
+
+    virtual void OnLogin(Player* pPlayer, bool firstLogin) { return; };
+};
+
+struct LootScript : public Script
+{
+    LootScript(const char* name) : Script(SCRIPTED_LOOT, name) {}
+
+    virtual uint8 ModQuestLoot(Player* player, LootItem item) { return 0; };
+    virtual bool ClearModQuestLoot(Player* player) { return true; };
+};
+
+struct AllMapScript : public Script
+{
+    AllMapScript(const char* name) : Script(SCRIPTED_MAP_ALL, name) {}
+
+    virtual void OnPlayerEnterAll(Map* map, Player* player) { return; };
+    virtual void OnPlayerLeaveAll(Map* map, Player* player) { return; };
+};
+
+struct AllCreatureScript : public Script
+{
+    AllCreatureScript(const char* name) : Script(SCRIPTED_CREATURE_ALL, name) {}
+
+    virtual void Creature_SelectLevel(CreatureInfo* const creatureTemplate, Creature* creature) { return; }
+    virtual void OnAllCreatureUpdate(Creature* pCreature, uint32 diff) { return; }
+};
+
 struct AreaTriggerScript : public Script
 {
     AreaTriggerScript(const char* name) : Script(SCRIPTED_AREATRIGGER, name) {}
@@ -226,7 +299,7 @@ struct AreaTriggerScript : public Script
 
 struct MapEventScript : public Script
 {
-    MapEventScript(const char *name) : Script(SCRIPTED_MAPEVENT, name) {}
+    MapEventScript(const char* name) : Script(SCRIPTED_MAPEVENT, name) {}
 
     virtual bool OnReceived(uint32, Object*, Object*, bool) { return false; }
 };
