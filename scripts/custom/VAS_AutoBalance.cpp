@@ -57,6 +57,12 @@ static std::map<int, int> logCreatureIds;                      // Used to log up
 static int8 PlayerCountDifficultyOffset; //cheaphack for difficulty server-wide. Another value TODO in player class for the party leader's value to determine dungeon difficulty.
 static float MaxDamagePct;               // Minimize total damage allowed by a pct of the player's health.
 static int8 lockPlayerCount;            // Sets the maximum player count for scaling.
+static int8 dungeonsOnly;
+static int8 instancesConfig;
+static int8 playerChangeNotify;
+static float numPlayer;
+static float minHpModifier;
+static float minDamageModifier;
 int GetValidDebugLevel()
 {
     int debugLevel = sConfig.GetIntDefault("VASAutoBalance.DebugLevel", 2);
@@ -238,6 +244,12 @@ public:
         LoadMaxHealthPctForDamage();
         LoadLockPlayerCount();
 
+        dungeonsOnly = sConfig.GetIntDefault("VASAutoBalance.DungeonsOnly", 1);
+        instancesConfig = sConfig.GetIntDefault("VASAutoBalance.Instances", 1);
+        playerChangeNotify = sConfig.GetIntDefault("VASAutoBalance.PlayerChangeNotify", 1);
+        numPlayer = sConfig.GetFloatDefault("VASAutoBalance.numPlayer", 1.0f);
+        minHpModifier = sConfig.GetFloatDefault("VASAutoBalance.MinHPModifier", 0.1f);
+        minDamageModifier = sConfig.GetFloatDefault("VASAutoBalance.MinDamageModifier", 0.1f);
         PlayerCountDifficultyOffset = 0;
     }
 };
@@ -250,7 +262,7 @@ public:
     {
     }
 
-    void OnLogin(Player *player, bool /*firstLogin*/)
+    void OnLogin(Player* player, bool /*firstLogin*/)
     {
         ChatHandler(player->GetSession()).PSendSysMessage("This server is running a VAS_AutoBalance Module.");
     }
@@ -267,7 +279,7 @@ public:
     void OnDamage(Creature* attacker, Unit* victim, uint32& damage) {
         if (attacker && victim)
         {
-            if ((attacker->GetMap()->IsDungeon() && victim->GetMap()->IsDungeon()) || sConfig.GetIntDefault("VASAutoBalance.DungeonsOnly", 1) < 1)
+            if ((attacker->GetMap()->IsDungeon() && victim->GetMap()->IsDungeon()) || dungeonsOnly < 1)
             {
                 if (attacker->GetTypeId() != TYPEID_PLAYER)
                 {
@@ -282,7 +294,7 @@ public:
 
     void ModHeal(Unit* healer, Creature* receiver, uint32& gain)
     {
-        if ((healer->GetMap()->IsDungeon() && receiver->GetMap()->IsDungeon()) || sConfig.GetIntDefault("VASAutoBalance.DungeonsOnly", 1) < 1)
+        if ((healer->GetMap()->IsDungeon() && receiver->GetMap()->IsDungeon()) || dungeonsOnly < 1)
         {
             if (!IsBlockedCreatureId(healer->GetEntry()))
             {
@@ -294,9 +306,9 @@ public:
         }
     }
 
-    uint32 HandlePeriodicDamageAurasTick(Unit *target, Creature *caster, int32 damage)
+    uint32 HandlePeriodicDamageAurasTick(Unit* target, Creature* caster, int32 damage)
     {
-        if ((caster->GetMap()->IsDungeon() && target->GetMap()->IsDungeon()) || sConfig.GetIntDefault("VASAutoBalance.DungeonsOnly", 1) < 1)
+        if ((caster->GetMap()->IsDungeon() && target->GetMap()->IsDungeon()) || dungeonsOnly < 1)
             if (caster->GetTypeId() != TYPEID_PLAYER)
             {
                 if (!(caster->IsPet() && caster->IsControlledByPlayer()))
@@ -305,9 +317,9 @@ public:
         return damage;
     }
 
-    void CalculateSpellDamageTaken(SpellNonMeleeDamage *damageInfo, int32 /*damage*/, SpellEntry const* /*spellInfo*/, WeaponAttackType/* attackType*/, bool /*crit*/)
+    void CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 /*damage*/, SpellEntry const* /*spellInfo*/, WeaponAttackType/* attackType*/, bool /*crit*/)
     {
-        if (sConfig.GetIntDefault("VASAutoBalance.DungeonsOnly", 1) < 1 || (damageInfo->attacker->GetMap()->IsDungeon() && damageInfo->target->GetMap()->IsDungeon()) || (damageInfo->attacker->GetMap()->IsBattleGround() && damageInfo->target->GetMap()->IsBattleGround()))
+        if (dungeonsOnly < 1 || (damageInfo->attacker->GetMap()->IsDungeon() && damageInfo->target->GetMap()->IsDungeon()) || (damageInfo->attacker->GetMap()->IsBattleGround() && damageInfo->target->GetMap()->IsBattleGround()))
         {
             if (damageInfo->attacker->GetTypeId() != TYPEID_PLAYER && damageInfo->attacker->ToCreature())
             {
@@ -319,10 +331,10 @@ public:
         return;
     }
 
-    void CalculateMeleeDamage(Unit* /*playerVictim*/, uint32 /*damage*/, CalcDamageInfo *damageInfo, WeaponAttackType /*attackType*/)
+    void CalculateMeleeDamage(Unit* /*playerVictim*/, uint32 /*damage*/, CalcDamageInfo* damageInfo, WeaponAttackType /*attackType*/)
     {
         // Make sure the Attacker and the Victim are in the same location, in addition that the attacker is not player.
-        if ((sConfig.GetIntDefault("VASAutoBalance.DungeonsOnly", 1) < 1 || (damageInfo->attacker->GetMap()->IsDungeon() && damageInfo->target->GetMap()->IsDungeon()) || (damageInfo->attacker->GetMap()->IsBattleGround() && damageInfo->target->GetMap()->IsBattleGround())) && (damageInfo->attacker->GetTypeId() != TYPEID_PLAYER))
+        if ((dungeonsOnly < 1 || (damageInfo->attacker->GetMap()->IsDungeon() && damageInfo->target->GetMap()->IsDungeon()) || (damageInfo->attacker->GetMap()->IsBattleGround() && damageInfo->target->GetMap()->IsBattleGround())) && (damageInfo->attacker->GetTypeId() != TYPEID_PLAYER))
             if (damageInfo->attacker->ToCreature())
                 if (!(damageInfo->attacker->ToCreature()->IsPet() && damageInfo->attacker->IsControlledByPlayer())) // Make sure that the attacker Is not a Pet of some sort
                 {
@@ -341,7 +353,7 @@ public:
         float damageMultiplier = CreatureDetails[AttackerUnit->GetObjectGuid()].DamageMultiplier;
 
         uint32 damageResult = damage * damageMultiplier;
-        
+
         if (damageResult > maxDamageThreshold) {
             return maxDamageThreshold;
         }
@@ -365,11 +377,11 @@ public:
             instancePlayerCount = lockPlayerCount;
         }
 
-        if (sConfig.GetIntDefault("VASAutoBalance.PlayerChangeNotify", 1) > 0)
+        if (playerChangeNotify > 0)
         {
             if ((map->IsDungeon()) && !player->isGameMaster())
             {
-                Map::PlayerList const &playerList = map->GetPlayers();
+                Map::PlayerList const& playerList = map->GetPlayers();
                 if (!playerList.isEmpty())
                 {
                     for (Map::PlayerList::const_iterator playerIteration = playerList.begin(); playerIteration != playerList.end(); ++playerIteration)
@@ -394,11 +406,11 @@ public:
 
         if (instancePlayerCount >= 1)
         {
-            if (sConfig.GetIntDefault("VASAutoBalance.PlayerChangeNotify", 1) > 0)
+            if (playerChangeNotify > 0)
             {
                 if ((map->IsDungeon()) && !player->isGameMaster())
                 {
-                    Map::PlayerList const &playerList = map->GetPlayers();
+                    Map::PlayerList const& playerList = map->GetPlayers();
                     if (!playerList.isEmpty())
                     {
                         for (Map::PlayerList::const_iterator playerIteration = playerList.begin(); playerIteration != playerList.end(); ++playerIteration)
@@ -428,8 +440,7 @@ public:
 
     void Creature_SelectLevel(const CreatureInfo* /*creatureTemplate*/, Creature* creature)
     {
-
-        if (creature->GetMap()->IsDungeon() || sConfig.GetIntDefault("VASAutoBalance.DungeonsOnly", 1) < 1)
+        if (creature->GetMap()->IsDungeon() || dungeonsOnly < 1)
         {
             int instancePlayerCount = creature->GetMap()->GetPlayersCountExceptGMs();
             if (lockPlayerCount > 0 && lockPlayerCount < instancePlayerCount) {
@@ -444,36 +455,16 @@ public:
 
     void OnAllCreatureUpdate(Creature* creature, uint32 /*diff*/)
     {
-        bool log = IsLogCreatureId(creature->GetEntry());
-        if (log) {
-           // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, is being checked OnAllCreatureUpdate.", creature->GetEntry(), creature->GetName());
-        }
         if (!IsBlockedCreatureId(creature->GetEntry())) {
-            Map *map = creature->GetMap();
+            Map* map = creature->GetMap();
             if (!map)
-                map = creature->GetMap();
-           // if (log) {
-               // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, is not on the blocked list.", creature->GetEntry(), creature->GetName());
-               // if (!map)
-                   // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, has no map information.", creature->GetEntry(), creature->GetName());
-               // else if (!map->GetPlayersCountExceptGMs())
-                   // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, has no player count information.", creature->GetEntry(), creature->GetName());
-               // else {
-                   // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, has map %s and playerCount %u.", creature->GetEntry(), creature->GetName(), map->GetMapName(), map->GetPlayersCountExceptGMs());
-               // }
-           // }
+                return;
             if (creature->IsDead() && CreatureDetails[creature->GetObjectGuid()].creatureId)
                 CreatureDetails.erase(creature->GetObjectGuid());
-            if (DoCreatureUpdate(creature, map, log))
+            if (DoCreatureUpdate(creature, map))
             {
-                if (log) {
-                   // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, has passed DoCreatureUpdate checks.", creature->GetEntry(), creature->GetName());
-                }
-                if (map->IsDungeon() || map->IsBattleGround() || sConfig.GetIntDefault("VASAutoBalance.DungeonsOnly", 1) < 1)
+                if (map->IsDungeon() || map->IsBattleGround() || dungeonsOnly < 1)
                 {
-                    if (log) {
-                       // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, is having attributes modified.", creature->GetEntry(), creature->GetName());
-                    }
                     ModifyCreatureAttributes(creature);
                 }
                 CreatureDetails[creature->GetObjectGuid()].instancePlayerCount = map->GetPlayersCountExceptGMs() + PlayerCountDifficultyOffset;
@@ -481,28 +472,16 @@ public:
                 CreatureDetails[creature->GetObjectGuid()].creatureId = creature->GetEntry();
             }
         }
-        else
-        {
-            if (log) {
-               // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, is on the blocked list.", creature->GetEntry(), creature->GetName());
-            }
-        }
     }
 
-    bool DoCreatureUpdate(Creature* creature, Map* map, bool /*log*/) {
+    bool DoCreatureUpdate(Creature* creature, Map* map) {
         if (CreatureDetails[creature->GetObjectGuid()].instanceId != map->GetInstanceId()) {
-           // if (log)
-               // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, update for new instanceid %u.", creature->GetEntry(), creature->GetName(), map->GetInstanceId());
             return true;
         }
         if (CreatureDetails[creature->GetObjectGuid()].creatureId != creature->GetEntry()) {
-           // if (log)
-               // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, update for altered creature_id %u to %u.", creature->GetEntry(), creature->GetName(), CreatureInfo[creature->GetGUID()].creatureId, creature->GetEntry());
             return true;
         }
         if (CreatureDetails[creature->GetObjectGuid()].instancePlayerCount != (map->GetPlayersCountExceptGMs() + PlayerCountDifficultyOffset)) {
-           // if (log)
-               // TC_LOG_DEBUG("creature.log", "VAS_Autobalance: CreatureId %u, name %s, update for altered player count.", creature->GetEntry(), creature->GetName());
             return true;
         }
 
@@ -511,7 +490,12 @@ public:
 
     void ModifyCreatureAttributes(Creature* creature)
     {
-        if ((creature->IsPet() && creature->IsControlledByPlayer()) || (creature->GetMap()->IsDungeon() && sConfig.GetIntDefault("VASAutoBalance.Instances", 1) < 1) || creature->GetMap()->GetPlayersCountExceptGMs() <= 0)
+        bool isPet = creature->IsPet();
+        bool isControlledByPlayer = creature->IsControlledByPlayer();
+        bool isDungeon = creature->GetMap()->IsDungeon();
+        bool vasInstancesBalance = instancesConfig < 1;
+        uint32 playersCount = creature->GetMap()->GetPlayersCountExceptGMs();
+        if ((isPet && isControlledByPlayer) || (isDungeon && vasInstancesBalance) || playersCount <= 0)
         {
             return;
         }
@@ -581,19 +565,19 @@ public:
         if ((creature->GetMapId() == 0 || creature->GetMapId() == 1 || creature->GetMapId() == 530) && (creature->IsElite() || creature->IsWorldBoss()))  // specific to World Bosses and elites in those Maps, this is going to use the entry XPlayer in place of instancePlayerCount.
         {
             if (baseHealth > 800000) {
-                healthMultiplier = (tanh((sConfig.GetFloatDefault("VASAutoBalance.numPlayer", 1.0f) - 5.0f) / 1.5f) + 1.0f) / 2.0f;
+                healthMultiplier = (tanh((numPlayer - 5.0f) / 1.5f) + 1.0f) / 2.0f;
 
             }
             else {
-                healthMultiplier = (tanh((sConfig.GetFloatDefault("VASAutoBalance.numPlayer", 1.0f) - 2.2f) / 1.5f) + 1.0f) / 2.0f; // Assuming a 5 man configuration, as World Bosses have been relatively retired since BC so unless the boss has some substantial baseHealth
+                healthMultiplier = (tanh((numPlayer - 2.2f) / 1.5f) + 1.0f) / 2.0f; // Assuming a 5 man configuration, as World Bosses have been relatively retired since BC so unless the boss has some substantial baseHealth
             }
 
         }
 
         // Ensure that the healthMultiplier is not lower than the configuration specified value. -- This may be Deprecated later.
-        if (healthMultiplier <= sConfig.GetFloatDefault("VASAutoBalance.MinHPModifier", 0.1f))
+        if (healthMultiplier <= minHpModifier)
         {
-            healthMultiplier = sConfig.GetFloatDefault("VASAutoBalance.MinHPModifier", 0.1f);
+            healthMultiplier = minHpModifier;
         }
 
         //Getting the list of Classes in this group - this will be used later on to determine what additional scaling will be required based on the ratio of tank/dps/healer
@@ -615,9 +599,9 @@ public:
         }
 
         // Can not be less then Min_D_Mod
-        if (damageMultiplier <= sConfig.GetFloatDefault("VASAutoBalance.MinDamageModifier", 0.1f))
+        if (damageMultiplier <= minDamageModifier)
         {
-            damageMultiplier = sConfig.GetFloatDefault("VASAutoBalance.MinDamageModifier", 0.1f);
+            damageMultiplier = minDamageModifier;
         }
 
         creature->SetCreateHealth(scaledHealth);
@@ -660,38 +644,41 @@ public:
                 return 5;// Lower Blackrock Spire
             }
         }
-        switch (mapId) {
-        case 33://Shadowfang Keep
-        case 34://Stormwind Stockade
-        case 36://Deadmines
-        case 43://Wailing Caverns
-        case 47://Razorfen Kraul
-        case 48://Blackfathom Deeps
-        case 70://Uldaman
-        case 90://Gnomeregan
-        case 109://Sunken Temple
-        case 129://Razorfen Downs
-        case 189://Scarlet Monastery
-        case 209://Zul'Farrak
-        case 230://Blackrock Depths
-        case 289://Scholomance
-        case 329://Stratholme
-        case 349://Maraudon
-        case 389://Ragefire Chasm
-        case 429://Dire Maul
-            return 5;
-        case 309://Zul'Gurub
-        case 531://Ahn'Qiraj Temple
-            return 20;
-        case 249://Onyxia's Lair
-        case 409://Molten Core
-        case 469://Blackwing Lair
-        case 509://Ruins of Ahn'Qiraj
-        case 533://Naxxramas
-            return 40;
-        default:
-            1;
+        else {
+            switch (mapId) {
+            case 33://Shadowfang Keep
+            case 34://Stormwind Stockade
+            case 36://Deadmines
+            case 43://Wailing Caverns
+            case 47://Razorfen Kraul
+            case 48://Blackfathom Deeps
+            case 70://Uldaman
+            case 90://Gnomeregan
+            case 109://Sunken Temple
+            case 129://Razorfen Downs
+            case 189://Scarlet Monastery
+            case 209://Zul'Farrak
+            case 230://Blackrock Depths
+            case 289://Scholomance
+            case 329://Stratholme
+            case 349://Maraudon
+            case 389://Ragefire Chasm
+            case 429://Dire Maul
+                return 5;
+            case 309://Zul'Gurub
+            case 531://Ahn'Qiraj Temple
+                return 20;
+            case 249://Onyxia's Lair
+            case 409://Molten Core
+            case 469://Blackwing Lair
+            case 509://Ruins of Ahn'Qiraj
+            case 533://Naxxramas
+                return 40;
+            default:
+                1;
+            }
         }
+        return 1; // fix a compiler warning - not all control paths return a value.
     }
 };
 //class VAS_AutoBalance_CommandScript : public CommandScript
