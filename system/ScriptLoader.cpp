@@ -126,6 +126,7 @@ void AddSC_boss_headless_horseman();
 void AddSC_instance_scarlet_monastery();
 void AddSC_boss_darkmaster_gandling();               // scholomance
 void AddSC_boss_jandicebarov();
+void AddSC_boss_rattlegore();
 void AddSC_instance_scholomance();
 void AddSC_scholomance();
 
@@ -338,6 +339,7 @@ void AddEasternKingdomsScripts()
     AddSC_instance_scarlet_monastery();
     AddSC_boss_darkmaster_gandling();                       // scholomance
     AddSC_boss_jandicebarov();
+    AddSC_boss_rattlegore();
     AddSC_instance_scholomance();
     AddSC_scholomance();
 #if defined (WOTLK) || defined (CATA) || defined(MISTS)

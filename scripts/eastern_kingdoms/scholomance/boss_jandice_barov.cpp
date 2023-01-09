@@ -57,7 +57,7 @@ struct boss_jandicebarov : public CreatureScript
         void Reset() override
         {
             m_uiCurseOfBloodTimer = 5000;
-            m_uiIllusionTimer = 15000;
+            m_uiIllusionTimer = 20000;
             m_uiBanishTimer = urand(9000, 13000);
         }
 
@@ -113,7 +113,7 @@ struct boss_jandicebarov : public CreatureScript
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_ILLUSIONS) == CAST_OK)
                 {
-                    m_uiIllusionTimer = 25000;
+                    m_uiIllusionTimer = 35000;
                 }
             }
             else
