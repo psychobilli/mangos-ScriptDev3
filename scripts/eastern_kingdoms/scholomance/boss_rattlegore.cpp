@@ -50,9 +50,6 @@ struct ClearDef
 static ClearDef m_aClearPoint[] =
 {
     {154689},
-    {154694},
-    {154699},
-    {154709},
     {154675},
     {154680},
     {154685},
@@ -74,7 +71,6 @@ static ClearDef m_aClearPoint[] =
     {154704},
     {154711},
     {154687},
-    {154688},
     {154692},
     {154693},
     {154697},
@@ -142,11 +138,11 @@ struct boss_rattlegore : public CreatureScript
 
 private:
     static void DespawnCreatures(std::list<Creature*> despawnCreatures, Creature* creature, uint32 uiEntry) {
-        GetCreatureListWithEntryInGrid(despawnCreatures, creature, uiEntry, 150.0f);
+        GetCreatureListWithEntryInGrid(despawnCreatures, creature, uiEntry, 220.0f);
         for (uint32 i = 0; i < countof(m_aClearPoint); i++)
             for (std::list<Creature*>::iterator iter = despawnCreatures.begin(); iter != despawnCreatures.end(); ++iter)
                 if ((*iter)->GetGUIDLow() == m_aClearPoint[i].m_uiGuid)
-                    (*iter)->ForcedDespawn();
+                    (*iter)->RemoveFromWorld();
         despawnCreatures.clear();
     }
 
