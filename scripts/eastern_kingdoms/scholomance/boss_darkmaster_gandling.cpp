@@ -67,7 +67,7 @@ struct boss_darkmaster_gandling : public CreatureScript
             m_uiArcaneMissilesTimer = 4500;
             m_uiShadowShieldTimer = 12000;
             m_uiCurseTimer = 2000;
-            m_uiTeleportTimer = 16000;
+            m_uiTeleportTimer = 30000;
         }
 
         void UpdateAI(const uint32 uiDiff) override

@@ -66,7 +66,7 @@ struct boss_baroness_anastari : public CreatureScript
             m_uiBansheeWailTimer = 0;
             m_uiBansheeCurseTimer = 10000;
             m_uiSilenceTimer = 25000;
-            m_uiPossessTimer = 15000;
+            m_uiPossessTimer = 45000;
             m_uiPossessEndTimer = 0;
         }
 
