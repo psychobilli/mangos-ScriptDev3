@@ -184,7 +184,7 @@ struct boss_baroness_anastari : public CreatureScript
 
                         m_possessedPlayer = pTarget->GetObjectGuid();
                         m_uiPossessEndTimer = 1000;
-                        m_uiPossessTimer = 30000;
+                        m_uiPossessTimer = 1000000;
                     }
                 }
             }
