@@ -93,7 +93,7 @@ struct RattlegoreSummonDef
     float m_fX, m_fY, m_fZ, m_fOrient;
 };
 
-RattlegoreSummonDef m_aSummonPoint[] =
+RattlegoreSummonDef m_aSummonPointRatt[] =
 {
     {NPC_DISEASED_GHOUL, 223.455f, 98.909f, 104.715f, 0.0f},
     {NPC_DISEASED_GHOUL, 221.354f, 103.765f, 104.715f, 0.0f},
@@ -129,9 +129,9 @@ struct boss_rattlegore : public CreatureScript
             DespawnCreatures(despawnCreatures, m_creature, NPC_DISEASED_GHOUL);
             DespawnCreatures(despawnCreatures, m_creature, NPC_REANIMATED_CORPSE);
             DespawnCreatures(despawnCreatures, m_creature, NPC_RISEN_ABERATION);
-            for (uint32 i = 0; i < countof(m_aSummonPoint); ++i)
-                m_creature->SummonCreature(m_aSummonPoint[i].m_uiEntry,
-                    m_aSummonPoint[i].m_fX, m_aSummonPoint[i].m_fY, m_aSummonPoint[i].m_fZ, m_aSummonPoint[i].m_fOrient,
+            for (uint32 i = 0; i < countof(m_aSummonPointRatt); ++i)
+                m_creature->SummonCreature(m_aSummonPointRatt[i].m_uiEntry,
+                    m_aSummonPointRatt[i].m_fX, m_aSummonPointRatt[i].m_fY, m_aSummonPointRatt[i].m_fZ, m_aSummonPointRatt[i].m_fOrient,
                     TEMPSPAWN_TIMED_DESPAWN, HOUR * IN_MILLISECONDS);
         }
     };
