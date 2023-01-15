@@ -132,7 +132,7 @@ struct boss_rattlegore : public CreatureScript
             for (uint32 i = 0; i < countof(m_aSummonPointRatt); ++i)
                 m_creature->SummonCreature(m_aSummonPointRatt[i].m_uiEntry,
                     m_aSummonPointRatt[i].m_fX, m_aSummonPointRatt[i].m_fY, m_aSummonPointRatt[i].m_fZ, m_aSummonPointRatt[i].m_fOrient,
-                    TEMPSPAWN_TIMED_DESPAWN, HOUR * IN_MILLISECONDS);
+                    TEMPSPAWN_CORPSE_TIMED_DESPAWN, HOUR * IN_MILLISECONDS);
         }
     };
 
