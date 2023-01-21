@@ -132,7 +132,7 @@ struct boss_darkmaster_gandling : public CreatureScript
                                 m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
                             }
 
-                            m_uiTeleportTimer = urand(20000, 35000);
+                            m_uiTeleportTimer = urand(30000, 45000);
                         }
                     }
                 }
