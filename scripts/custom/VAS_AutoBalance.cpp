@@ -639,6 +639,10 @@ public:
             case 10372:
             case 10083:
             case 10430:
+            case 10742:
+            case 10447:
+            case 10442:
+            case 10429:
                 return 10;// Upper Blackrock Spire
             default:
                 return 5;// Lower Blackrock Spire
