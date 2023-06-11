@@ -24,9 +24,13 @@ public:
 
         uint8 additionalItems = groupSize - 2; // Add 3 items for a 5 man, 2 for 4, 1 for 3. Dual boxers get no love.
 
-        uint32 maxCount = sObjectMgr.GetItemPrototype(item.itemid)->MaxCount;
+        ItemPrototype const* itemPro = sObjectMgr.GetItemPrototype(item.itemid);
+        uint32 maxCount = itemPro->MaxCount;
         if (maxCount > 0 && maxCount < additionalItems + 1)
             return 0; // Don't add more items than the player can carry.
+        uint32 stackable = itemPro->Stackable;
+        if (stackable > 0 && stackable < additionalItems + 1)
+            return stackable - 1; // Don't add more items than the player can stack.
         groupItemData[item.itemid] = pPlayer->GetGroup()->GetId();
 
         return additionalItems;
